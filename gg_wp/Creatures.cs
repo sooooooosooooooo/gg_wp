@@ -47,7 +47,7 @@ namespace gg_wp
                 else Console.WriteLine("invalid input,please try again!");
             }
         }
-        public static void Fight(Player player, Creature enemy, ConsoleKeyInfo key, bool end)            // fight code for interaction
+        public static void Fight(Player player, Creature enemy, ConsoleKeyInfo key,ref bool end,ref int enemy_count)            // fight code for interaction
         {
             Console.Write($"you meet enemy {enemy.name},choose\n1 - fight.\n2 - retreat.\nyour choice:");
             string choise = "";
@@ -90,13 +90,17 @@ namespace gg_wp
                                 Console.WriteLine($"{player.name} use block\n");
                                 player.health = Convert.ToInt32(player.health - enemy.damage / 100.0f * (100 - player.armor * 2));                                    // doubled arrmor and enemy hit
                                 enemy.health = Convert.ToInt32(enemy.damage / 5.0f);                                                                                // reflected damage to enemy 
-                                Console.WriteLine($"enemy dealt {Convert.ToString(Convert.ToInt32(player.health - enemy.damage / 100.0f * (100 - player.armor * 2)))}.\n" +
+                                Console.WriteLine($"enemy dealt {Convert.ToString(Convert.ToInt32(enemy.damage / 100.0f * (100 - player.armor * 2)))}.\n" +
                                     $"{player.name} reflected {Convert.ToString(Convert.ToInt32(enemy.damage / 5.0f))} damage");
                                 break;
                         }
                         Console.WriteLine(new string('-', 100));
                     }
-                    if (enemy.health <= 0 && player.health > 0) Console.WriteLine("You defeat enemy,well done!");                                                   // player winning against enemy 
+                    if (enemy.health <= 0 && player.health > 0)
+                    {
+                        Console.WriteLine("You defeat enemy,well done!");                                                   // player winning against enemy 
+                        enemy_count--;
+                    }
                     else if (player.health <= 0)
                     {
                         Console.WriteLine("you are dead!next time be careful in adventure...");
@@ -122,7 +126,7 @@ namespace gg_wp
             }
         }
     }
-    internal class Player : Creature                                        // player stat seting and show_stats function for interface
+    internal class Player : Creature                                        // player stat class
     {
         Random rnd = new Random();
         public int x_position = 1;

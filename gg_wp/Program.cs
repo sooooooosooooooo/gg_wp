@@ -11,50 +11,28 @@ namespace gg_wp
         static void Main(string[] args)
         {
             Random rnd = new Random();
-            Map map = new Map(20, 40, 1, 5);
-            char[,] Map = map.CreateMap();
+            Map map = new Map(20, 40, 10, 10);
+            char[,] Map = map.CreateMap();                                         // generating map and placing in 2d array,generation in map.cs
             Console.Write("choose nickname for your hero:");
-            Player player = new Player(Console.ReadLine());
+            Player player = new Player(Console.ReadLine());                         // answering for a hero name to plaier
             int enemy_count = map.Enemy_count;
             Console.Clear();
             bool end = true;
             while (end)                                                            // making eternal cycle
             {
                 Console.SetCursorPosition(0, 0);
-                for (int i = 0; i < Map.GetLength(0); i++)                        // printing map for visualisint position
-                {
-                    for (int j = 0; j < Map.GetLength(1); j++)
-                    {
-                        Console.Write(Map[i, j]);
-                    }
-                    Console.WriteLine();
-                }
-                Console.SetCursorPosition(player.y_position, player.x_position);  // placing player on map
+                MainFunctions.ShowMap(Map);                                        // showing map with ShowMap() from MainFunctions.cs
+                Console.SetCursorPosition(player.y_position, player.x_position);   // placing player on map,player stats in Creature.cs 
                 Console.Write(player.id);
-                for (int i = 0; i < 5; i++)                                       // showing player stats
+                for (int i = 0; i < 5; i++)                                       // showing player stats,function in creatures.cs - ShowStats()
                 {
                     Console.SetCursorPosition(map.Map_width + 15, i);
                     player.ShowStats(i);
                 }
-                Console.SetCursorPosition(map.Map_width + 15, 6);                   // showing how many enemyes left to win
+                Console.SetCursorPosition(map.Map_width + 15, 6);                     // showing how many enemyes left to win
                 Console.Write($"DEFEAT {enemy_count} ENEMIES TO WIN! ENEMY -> *");
                 ConsoleKeyInfo key = Console.ReadKey();
-                switch (key.Key)                                                    //players moving and checking is there wall or not
-                {
-                    case ConsoleKey.UpArrow:
-                        if (Map[player.x_position - 1, player.y_position] != '#')
-                            player.x_position--;break;
-                    case ConsoleKey.DownArrow:
-                        if (Map[player.x_position + 1, player.y_position] != '#')
-                            player.x_position++;break;
-                    case ConsoleKey.LeftArrow:
-                        if (Map[player.x_position, player.y_position - 1] != '#')
-                            player.y_position--;break;
-                    case ConsoleKey.RightArrow:
-                        if (Map[player.x_position,player.y_position + 1] != '#')
-                            player.y_position++;break;
-                    
-                }
+                MainFunctions.PlayerMovement(key, player, Map);                         // player movements,function in MainFunctions.cs - PlayerMovement()
                 Console.SetCursorPosition(0, map.Map_length + 2);
                 if (Map[player.x_position,player.y_position] == '&')                      //when player meet healing potion - condition
                 {
@@ -63,36 +41,12 @@ namespace gg_wp
                 }
                 else if (Map[player.x_position,player.y_position] == '*')                   // when player meet enemy - condition
                 {
-                    int enemy = 0;
+                    int enemy = rnd.Next(0,3);
                     string[] enemys = new string[3] {"kobold","goblin","wolf"};
-                    switch (enemy)                                                         // fight code compilation
-                    {
-                        case 0:                                                            //code of Fight() in creatures.cs  - (there player choose fight 
-                            Kobold kobold = new Kobold();                                  //or retreat and in 1st condition full fight scene code)
-                            Creature.Fight( player, kobold, key, end);
-                            Map[player.x_position, player.y_position] = ' ';
-                            break;
-                        case 1:
-                            Goblin goblin = new Goblin();
-                            Creature.Fight( player, goblin, key, end);
-                            Map[player.x_position, player.y_position] = ' ';
-                            break;
-                        case 2:
-                            Wolf wolf = new Wolf();
-                            Creature.Fight( player, wolf, key, end);
-                            Map[player.x_position, player.y_position] = ' ';
-                            break;
-                    }
-                    enemy_count--;
+                    MainFunctions.EnemyMeetingAndFight(enemy, player, ref enemy_count, Map,ref end, key);          // enemy meeting and fight scene,function in MainFunctions.cs - EnemyMeetingAndFight()
                 }
                 Console.Clear();
-                if (enemy_count == 0)                                                         // player killing all enemyes and wining announcement by prog
-                {
-                    Console.WriteLine("Great you defeated all enemys and save world!\n" +
-                        "i guess you liked this mini game :)");
-                    end = false;
-                    Console.ReadKey();
-                }
+                MainFunctions.GameOver(ref end, enemy_count);                                                       // game over contidion,function in MainFunctions.cs - GameOver()
             }
         }
     }
